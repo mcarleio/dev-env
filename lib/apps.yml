@@ -1,0 +1,91 @@
+---
+- include_vars: ../vars.yml
+
+- name: Ensure download directory exists
+  file:
+    path: "{{ apps.download_dir }}"
+    state: directory
+
+- name: Ensure app directory exists
+  file:
+    path: "{{ apps.app_dir }}"
+    state: directory
+
+- name: Ensure install protocol exists
+  file:
+    path: "{{ apps.installed_file }}"
+    state: touch
+
+- name: Ensure PATH file exists
+  file:
+    path: "{{ apps.path_file }}"
+    state: touch
+
+- name: Load installed apps
+  shell: "grep -F {{ item.url | basename | quote }} {{ apps.installed_file | quote }} | awk -F ' ::: ' '{print $1; print $2}' || true"
+  loop: "{{ apps.list }}"
+  register: app_list
+
+- name: Download missing apps
+  get_url: url={{ item.item.url }} dest={{ apps.download_dir }}/{{ item.item.url | basename }} validate_certs=no timeout=30
+  loop: "{{ app_list.results }}"
+  when: item.stdout | length == 0
+
+- name: Ensure temporary directory exists
+  file:
+    path: "{{ apps.extract_dir }}/{{ item.item.url | basename }}"
+    state: directory
+  loop: "{{ app_list.results }}"
+  when: item.stdout | length == 0
+
+- name: Extract downloaded apps
+  unarchive: src={{ apps.download_dir }}/{{ item.item.url | basename }} dest={{ apps.extract_dir }}/{{ item.item.url | basename }}
+  loop: "{{ app_list.results }}"
+  when: item.stdout | length == 0
+
+- name: Load path of extracted directory
+  shell: "if [ `ls {{ apps.extract_dir | quote }}/{{ item.item.url | basename | quote }} | wc -l` -gt 1 ]; then find {{ apps.extract_dir | quote }}/{{ item.item.url | basename | quote }} -maxdepth 0; else find {{ apps.extract_dir | quote }}/{{ item.item.url | basename | quote }}/* -maxdepth 0; fi"
+  loop: "{{ app_list.results }}"
+  when: item.stdout | length == 0
+  register: extracted_app_dir
+
+- name: Make sure specific app directory not exists
+  file: path={{ apps.app_dir }}/{{ item.stdout | basename }} state=absent
+  loop: "{{ extracted_app_dir.results }}"
+  when: item.item.stdout | length == 0
+
+- name: Move extracted app into app directory
+  shell: "mv {{ item.stdout | quote }} {{ apps.app_dir }}/{{ item.stdout | basename }}"
+  loop: "{{ extracted_app_dir.results }}"
+  when: item.item.stdout | length == 0
+
+- name: Symlink new apps
+  file: path={{ apps.link_dir | quote }}/{{ item.item.item.symlinked_dir | quote }} src={{ apps.app_dir }}/{{ item.stdout | basename }} state=link
+  loop: "{{ extracted_app_dir.results }}"
+  when: item.item.stdout | length == 0
+
+- name: Symlink existing apps (e.g. in case of version switch)
+  file: path={{ apps.link_dir | quote }}/{{ item.item.item.symlinked_dir | quote }} src={{ apps.app_dir }}/{{ item.item.stdout_lines[1] | basename }} state=link
+  loop: "{{ extracted_app_dir.results }}"
+  when: item.item.stdout_lines[1] is defined
+
+- name: Protocol downloaded apps
+  lineinfile:
+    path: "{{ apps.installed_file }}"
+    line: "{{ item.item.item.url }} ::: {{ item.stdout | basename }}"
+    state: present
+  loop: "{{ extracted_app_dir.results }}"
+  when: item.item.stdout | length == 0
+
+- name: Remove downloaded apps
+  file: path={{ apps.download_dir }}/{{ item.item.url | basename }} state=absent
+  loop: "{{ app_list.results }}"
+  when: item.stdout | length == 0
+
+- name: Add bin to PATH
+  lineinfile:
+    path: "{{ apps.path_file }}"
+    line: "export PATH={{ apps.link_dir | quote }}/{{ item.item.symlinked_dir | quote }}/{{ item.item.bin_path | quote }}:$PATH"
+    state: present
+  loop: "{{ app_list.results }}"
+  when: item.item.bin_path is defined
