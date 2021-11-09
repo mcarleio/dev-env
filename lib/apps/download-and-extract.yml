@@ -1,0 +1,182 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+# ################################################################################
+# TODO: Execute (most) steps per defined app from start to end,
+#       before starting with the next.
+#       Maybe parallelize that whole process, instead of just the downloads
+# ################################################################################
+
+- name: Change owner of /opt
+  become: yes
+  file:
+    path: "{{ apps.link_dir }}"
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+
+- name: Create custom temp directory
+  file:
+    path: "{{ config.temp }}"
+    state: directory
+
+- name: Create temporary directory
+  tempfile:
+    state: directory
+    path: "{{ config.temp }}"
+  register: tempdir
+
+- name: Create temporary download directory
+  tempfile:
+    state: directory
+    path: "{{ config.temp }}"
+  register: tempdownload
+
+- name: Ensure app directory exists
+  file:
+    path: "{{ apps.app_dir }}"
+    state: directory
+
+- name: Ensure install protocol exists
+  file:
+    path: "{{ apps.installed_file }}"
+    state: touch
+
+- name: Ensure PATH file exists
+  file:
+    path: "{{ apps.path_file }}"
+    state: touch
+
+- name: Load installed apps
+  shell: "grep -F {{ item.url | basename | quote }} {{ apps.installed_file | quote }} | awk -F ' ::: ' '{print $1; print $2}' || true"
+  loop: "{{ apps.list.values() }}"
+  register: app_list
+
+- name: Check installed app is still installed
+  stat:
+    path: "{{ apps.app_dir | quote }}/{{ item.stdout_lines[1] | basename | quote }}"
+  loop: "{{ app_list.results }}"
+  when: item.stdout_lines[1] is defined
+  register: app_is_installed
+
+- name: Remove app from installed file
+  lineinfile:
+    path: "{{ apps.installed_file }}"
+    line: "{{ item.item.item.url }} ::: {{ item.item.stdout_lines[1] | basename }}"
+    state: absent
+  loop: "{{ app_is_installed.results }}"
+  when: item.stat is defined and not item.stat.exists
+
+- name: Reload installed apps
+  shell: "(grep -F {{ item.url | basename | quote }} {{ apps.installed_file | quote }} || true) | awk -F ' ::: ' '{print $1; print $2}'"
+  loop: "{{ apps.list.values() }}"
+  register: app_list
+
+- name: Download missing apps
+  get_url:
+    url: "{{ item.item.url | quote }}"
+    dest: "{{ tempdownload.path | quote }}/{{ item.item.url | basename | quote }}"
+    timeout: 230
+  loop: "{{ app_list.results }}"
+  when: item.stdout | length == 0
+  async: 240
+  poll: 0
+  register: _downloads
+
+- name: Wait for downloads to finish
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: _downloads_checked
+  retries: 48
+  delay: 5
+  when: item.ansible_job_id is defined
+  until: _downloads_checked.finished
+  loop: "{{_downloads.results}}"
+
+- name: Move extracted executables into app directory
+  shell: "mv {{ tempdownload.path | quote }}/{{ item.item.url | basename | quote }} {{ apps.app_dir | quote }}/{{ item.item.url | basename | quote }}; chmod +x {{ apps.app_dir | quote }}/{{ item.item.url | basename | quote }}"
+  loop: "{{ app_list.results }}"
+  when: 
+    - item.stdout | length == 0
+    - item.item.executable | default(false)
+
+- name: Protocol downloaded executables
+  lineinfile:
+    path: "{{ apps.installed_file }}"
+    line: "{{ item.item.url }} ::: {{ item.item.url | basename }}"
+    state: present
+  loop: "{{ app_list.results }}"
+  when: item.item.executable | default(false)
+
+- name: Ensure temporary directory for extract exists
+  file:
+    path: "{{ tempdir.path | quote }}/{{ item.item.url | basename | quote }}"
+    state: directory
+  loop: "{{ app_list.results }}"
+  when:
+    - item.stdout | length == 0
+    - not item.item.executable | default(false)
+
+- name: Extract downloaded apps
+  unarchive:
+    src: "{{ tempdownload.path | quote }}/{{ item.item.url | basename | quote }}"
+    dest: "{{ tempdir.path | quote }}/{{ item.item.url | basename | quote }}"
+  loop: "{{ app_list.results }}"
+  when:
+    - item.stdout | length == 0
+    - not item.item.executable | default(false)
+
+- name: Load path of extracted directory
+  shell: "if [ `ls {{ tempdir.path | quote }}/{{ item.item.url | basename | quote }} | wc -l` -gt 1 ]; then find {{ tempdir.path | quote }}/{{ item.item.url | basename | quote }} -maxdepth 0; else find {{ tempdir.path | quote }}/{{ item.item.url | basename | quote }}/* -maxdepth 0; fi"
+  loop: "{{ app_list.results }}"
+  when: 
+    - item.stdout | length == 0
+    - not item.item.executable | default(false)
+  register: extracted_app_dir
+
+- name: Make sure specific app directory not exists
+  file:
+    path: "{{ apps.app_dir | quote }}/{{ item.stdout | basename | quote }}"
+    state: absent
+  loop: "{{ extracted_app_dir.results }}"
+  when:
+    - item.item.stdout | length == 0
+    - not item.skipped | default(false)
+
+- name: Move extracted app into app directory
+  shell: "mv {{ item.stdout | quote }} {{ apps.app_dir | quote }}/{{ item.stdout | basename | quote }}"
+  loop: "{{ extracted_app_dir.results }}"
+  when:
+    - item.item.stdout | length == 0
+    - not item.skipped | default(false)
+
+- name: Symlink new apps
+  file:
+    path: "{{ apps.link_dir | quote }}/{{ item.item.item.symlinked_dir | quote }}"
+    src: "{{ apps.app_dir | quote }}/{{ item.stdout | basename | quote }}"
+    state: link
+  loop: "{{ extracted_app_dir.results }}"
+  when:
+    - item.item.stdout | length == 0
+    - not item.skipped | default(false)
+    - not item.item.item.single_file | default(false)
+
+- name: Symlink existing apps (e.g. in case of version switch)
+  file:
+    path: "{{ apps.link_dir | quote }}/{{ item.item.item.symlinked_dir | quote }}"
+    src: "{{ apps.app_dir | quote }}/{{ item.item.stdout_lines[1] | basename | quote }}"
+    state: link
+  loop: "{{ extracted_app_dir.results }}"
+  when:
+    - item.item.stdout_lines[1] is defined
+    - not item.skipped | default(false)
+    - not item.item.item.single_file | default(false)
+
+- name: Protocol downloaded & extracted apps
+  lineinfile:
+    path: "{{ apps.installed_file }}"
+    line: "{{ item.item.item.url }} ::: {{ item.stdout | basename }}"
+    state: present
+  loop: "{{ extracted_app_dir.results }}"
+  when:
+    - item.item.stdout | length == 0
+    - not item.skipped | default(false)
