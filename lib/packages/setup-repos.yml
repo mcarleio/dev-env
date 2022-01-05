@@ -1,0 +1,72 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Install needed packages
+  become: yes
+  pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - yay
+    - base-devel
+  when: ansible_pkg_mgr == "pacman"
+
+
+
+- name: Install needed dnf repositories
+  become: yes
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.desc }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: yes
+    gpgkey: "{{ item.gpg }}"
+  loop: "{{ repositories[ansible_pkg_mgr] }}"
+  when: ansible_pkg_mgr == "dnf" and not item.repo is defined
+
+- name: Install needed dnf repositories
+  become: yes
+  shell: dnf config-manager --add-repo={{ item.repo }}
+  loop: "{{ repositories[ansible_pkg_mgr] }}"
+  when: ansible_pkg_mgr == "dnf" and item.repo is defined
+
+
+
+- name: Install needed packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+  when: ansible_pkg_mgr == "apt"
+
+- name: Load apt os distirbution codename
+  shell: lsb_release -cs
+  register: _APT_OS_DISTRIBUTION
+  when: ansible_pkg_mgr == "apt"
+
+- name: Delete GPG keys
+  become: yes
+  file:
+    path: "/usr/share/keyrings/{{ item.name | lower }}-keyring.gpg"
+    state: absent
+  loop: "{{ repositories[ansible_pkg_mgr] }}"
+  when: ansible_pkg_mgr == "apt"
+
+- name: Download GPG keys
+  become: yes
+  shell: "curl -fsSL {{ item.gpg }} | gpg --dearmor -o /usr/share/keyrings/{{ item.name | lower }}-keyring.gpg"
+  loop: "{{ repositories[ansible_pkg_mgr] }}"
+  when: ansible_pkg_mgr == "apt"
+
+- name: Install needed apt repositories
+  become: yes
+  apt_repository:
+    repo: deb [ signed-by=/usr/share/keyrings/{{ item.name | lower }}-keyring.gpg ] {{ item.baseurl }} {{ item.distribution | d(_APT_OS_DISTRIBUTION.stdout) }} {{ item.components }}
+  loop: "{{ repositories[ansible_pkg_mgr] }}"
+  when: ansible_pkg_mgr == "apt"

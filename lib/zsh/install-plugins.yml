@@ -1,0 +1,18 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Register plugin installation status
+  stat:
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/{{ item.type }}/{{ item.name }}"
+  loop: "{{ ohmyzsh.install }}"
+  register: _plugin_status
+  
+- name: Install plugin
+  shell: git clone {{ item.item.url }} {{ ansible_env.HOME }}/.oh-my-zsh/custom/{{ item.item.type }}/{{ item.item.name }}
+  loop: "{{ _plugin_status.results }}"
+  when: not item.stat.exists | d(false)
+
+- name: Update plugin
+  shell: git -C {{ ansible_env.HOME }}/.oh-my-zsh/custom/{{ item.item.type }}/{{ item.item.name }} pull
+  loop: "{{ _plugin_status.results }}"
+  when: item.stat.exists | d(false)

@@ -1,0 +1,22 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+
+- name: Load setting for guake
+  #shell: "guake --restore-preferences={{ playbook_dir }}/config/guake.conf"
+  shell: "dconf load /apps/guake/ < '{{ playbook_dir }}/config/guake.conf'"
+
+- name: Manual keybinding for guake (to overcome problems with wayland) # see https://github.com/Guake/guake/issues/1642
+  dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+      value: ["/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"]
+    - key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/binding"
+      value: "'F10'"
+    - key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command"
+      value: "'guake'"
+    - key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name"
+      value: "'guake'"

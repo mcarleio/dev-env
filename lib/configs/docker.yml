@@ -1,0 +1,2 @@
+# TODO: Add user to docker group to allow running docker without sudo
+# TODO: Start docker service on startup

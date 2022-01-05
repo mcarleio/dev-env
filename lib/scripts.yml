@@ -1,0 +1,14 @@
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Create {{ apps.scripts_dir }}
+  file:
+    path: "{{ apps.scripts_dir }}"
+    state: directory
+
+- name: Copies scripts into {{ apps.scripts_dir }}
+  copy:
+    src: "{{ item }}"
+    dest: "{{ apps.scripts_dir }}/{{ item | basename }}"
+    mode: u+x
+  loop: "{{ lookup('fileglob', playbook_dir + '/scripts/*.sh', wantlist=True) }}"
+

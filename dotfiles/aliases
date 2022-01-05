@@ -1,0 +1,21 @@
+alias ll="ls -alF"
+
+# Usage: echo "XYZ" | xclip
+# Result: Copies XYZ to clipboard
+alias xclip="xclip -selection c"
+
+# Usage: latestChanges <dir>
+# Output: most recently changed files under the specified directory (recursively)
+latestChanges() {
+  find "$1" -type f -exec stat --format '%Y :%y %n' "{}" \; | sort -nr | cut -d: -f2- | head
+}
+
+# Usage: countOcurrences <file>
+# Output: most used lines in specified file
+countOcurrences() {
+  sort "$1" | uniq -c | sort -k1nr | head
+}
+
+reloadWallpaper() {
+  /opt/.scripts/reload-wallpaper.sh
+}

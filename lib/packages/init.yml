@@ -1,0 +1,4 @@
+---
+ - include: setup-repos.yml
+ - include: update-packages.yml
+ - include: install-packages.yml

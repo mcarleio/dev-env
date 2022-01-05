@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Camunda Modeler
+Keywords=bpmn;cmmn;dmn;form;modeler;camunda
+GenericName=Process Modeling Tool
+Type=Application
+Categories=Development
+Terminal=false
+StartupNotify=true
+Path={{ app_dir }}
+Exec="{{ app_dir }}/camunda-modeler" %F
+MimeType=application/bpmn;application/cmmn;application/dmn;application/camunda-form
+Icon={{ app_dir }}/support/icon_128.png
+X-Ayatana-Desktop-Shortcuts=NewWindow;RepositoryBrowser

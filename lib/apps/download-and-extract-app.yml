@@ -1,0 +1,141 @@
+---
+# Var: appname -> Name of the app
+# Var: app -> apps.list.<appname>
+
+- name: Clear facts
+  set_fact:
+    target_url:
+    target_foldername:
+    app_installed:
+    extracted_root:
+    target_temp_dir:
+
+- name: Create temporary download directory
+  tempfile:
+    state: directory
+    path: "{{ config.temp }}"
+  register: tempdownload
+
+- name: Create temporary directory
+  tempfile:
+    state: directory
+    path: "{{ config.temp }}"
+  register: tempdir
+
+#######################
+### URL UNVERSIONED ###
+#######################
+
+- name: |
+    If the URL does not contain the specific version of the app,
+    make a HEAD call, to (hopefully) get the target URL incl. some
+    specific version
+  uri:
+    url: "{{ app.url }}"
+    method: HEAD
+  register: _uri
+  when: app.url_unversioned | default(false)
+
+###########################
+### END URL UNVERSIONED ###
+###########################
+
+### Check if app was and is still installed
+
+- name: |
+    Extract the target_url from either the previously loaded URL
+    or from the configured URL.
+  set_fact:
+    target_url: "{{ _uri.url | default(app.url) }}"
+
+- name: |
+    Check, if the app was already installed. If yes, it returns
+    the installed folder name.
+  shell: "(grep -F {{ (target_url + ' ::: ') | quote }} {{ apps.installed_file | quote }} || true) | awk -F ' ::: ' '{print $2}'"
+  register: _grep
+
+- name: Set facts
+  set_fact:
+    target_foldername: "{{ _grep.stdout }}"
+  when: _grep.stdout | length > 0
+
+- name: Check if the app is still installed
+  stat:
+    path: "{{ apps.app_dir }}/{{ target_foldername }}"
+  # Output:
+  #   stat.exists => shows if installed app still exists
+  when: target_foldername != None
+  register: _stat
+
+- name: Set facts
+  set_fact:
+    app_installed: "{{ _stat.stat.exists | default(false) }}"  
+
+### If app is installed, update symlinks
+- name: |
+    Update the symlinks of existing apps
+    (e.g. in case of version switch)
+  file:
+    path: "{{ apps.link_dir }}/{{ app.symlinked_dir }}"
+    src: "{{ apps.app_dir }}/{{ target_foldername }}"
+    state: link
+  when:
+    - app_installed
+    - not (app.executable | default(false))
+    - not (app.single_file | default(false))
+
+### If app not installed anymore, remove from protocol
+- name: |
+    If the app is not installed anymore, remove the line from
+    the {{ apps.installed_file }} file
+  lineinfile:
+    path: "{{ apps.installed_file }}"
+    search_string: "{{ target_url }} ::: "
+    state: absent
+  when: 
+    - not app_installed
+    - target_foldername != None
+
+### Download
+- name: Download the app {{ appname }}
+  get_url:
+    url: "{{ target_url }}"
+    dest: "{{ tempdownload.path }}"
+  when: 
+    - not app_installed
+  register: _download
+
+
+### Extract (either or)
+- name: Extract executable app {{ appname }}
+  include: extract_executable.yml
+  when:
+    - not app_installed
+    - app.executable | default(false) 
+
+- name: Extract app {{ appname }}
+  include: extract.yml
+  when:
+    - not app_installed
+    - not (app.executable | default(false))
+
+### Protocol downloaded app
+- name: |
+    Protocol the (actual) URL and the name of the extracted folder
+    or single executable
+  lineinfile:
+    path: "{{ apps.installed_file }}"
+    line: "{{ target_url }} ::: {{ extracted_root }}"
+    state: present
+  when:
+    - not app_installed
+
+- name: Cleanup temporary files
+  file:
+    path: "{{ tempdownload.path }}"
+    state: absent
+
+- name: Cleanup temporary files
+  file:
+    path: "{{ tempdir.path }}"
+    state: absent

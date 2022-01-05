@@ -1,0 +1,20 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+
+
+- name: Create config dir for IntelliJ IDEA
+  file:
+    path: "{{ apps.list.idea.config_dir }}/{{ item.path }}"
+    state: directory
+    recurse: yes
+  loop: "{{ lookup('filetree', playbook_dir + '/config/idea/') }}"
+  when: item.state == 'directory'
+
+- name: Copy config files to IntelliJ IDEA
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ apps.list.idea.config_dir }}/{{ item.path }}"
+  loop: "{{ lookup('filetree', playbook_dir + '/config/idea/') }}"
+  when:
+   - item.state == "file"

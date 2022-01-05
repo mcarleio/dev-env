@@ -1,0 +1,6 @@
+---
+ - include: idea.yml
+ - include: sublime.yml
+ - include: gnome.yml
+ - include: guake.yml
+ - include: system.yml

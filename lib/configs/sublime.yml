@@ -1,0 +1,26 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Create sublime-text Installed Packages folder
+  file:
+    path: "{{ config.dir }}/sublime-text/Installed Packages"
+    state: directory
+    recurse: yes
+
+- name: Install sublime-text Package Control
+  get_url:
+    url: https://packagecontrol.io/Package%20Control.sublime-package
+    dest: "{{ config.dir }}/sublime-text/Installed Packages/Package Control.sublime-package"
+
+- name: Create sublime-text config folder
+  file:
+    path: "{{ config.dir }}/sublime-text/Packages/User"
+    state: directory
+    recurse: yes
+
+- name: Copy sublime-text config file
+  copy:
+    src: "{{ playbook_dir }}/config/{{ item }}"
+    dest: "{{ config.dir }}/{{ item }}"
+  loop: 
+   - sublime-text/Packages/User/Default (Linux).sublime-keymap

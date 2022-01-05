@@ -1,0 +1,23 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+
+- name: Check oh-my-zsh already installed
+  stat:
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh"
+  register: _zsh_status
+
+- name: Download oh-my-zsh install script
+  get_url:
+    url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+    dest: "/tmp/install-oh-my-zsh.sh"
+    timeout: 30
+  when: not _zsh_status.stat.exists | d(false)
+
+- name: Install oh-my-zsh
+  shell: "sh /tmp/install-oh-my-zsh.sh --unattended --keep-zshrc"
+  when: not _zsh_status.stat.exists | d(false)
+
+- name: Update Oh My Zsh
+  shell: git -C {{ ansible_env.HOME }}/.oh-my-zsh pull
+  when: _zsh_status.stat.exists | d(false)

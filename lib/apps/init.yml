@@ -1,0 +1,3 @@
+---
+ - include: download-and-extract.yml
+ - include: bin-path-and-desktop.yml

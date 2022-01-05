@@ -1,0 +1,23 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Create temporary directory
+  tempfile:
+    state: directory
+  register: tempdir
+
+- name: Sparse-Clone nerd-fonts from GitHub 
+  shell: 
+    cmd: "git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git"
+    chdir: "{{ tempdir.path }}"
+
+- name: Sparse-Checkout desired fonts
+  shell: 
+    cmd: "git sparse-checkout add patched-fonts/{{ item }}"
+    chdir: "{{ tempdir.path }}/nerd-fonts"
+  loop: "{{ config.fonts }}"
+
+- name: Install desired fonts
+  shell:
+    cmd: ./install.sh {{ config.fonts | join(" ") }}
+    chdir: "{{ tempdir.path }}/nerd-fonts"

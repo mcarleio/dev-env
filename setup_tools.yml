@@ -1,4 +1,14 @@
 ---
 - hosts: localhost
   tasks:
-   - include: lib/apps.yml
+    - include: lib/packages/init.yml
+    - include: lib/apps/init.yml
+    - include: lib/zsh/init.yml
+    - include: lib/configs/init.yml
+    
+    - include: lib/customrc.yml
+    - include: lib/git.yml
+    - include: lib/fonts.yml
+
+    - include: lib/scripts.yml
+    - include: lib/reload-wallpaper.yml

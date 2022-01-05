@@ -1,0 +1,14 @@
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Create autostart desktop files folder
+  file: path={{ config.dir }}/autostart state=directory
+
+- name: Add desktop file for reload-wallpaper.sh
+  template:
+    src: "{{ playbook_dir }}/desktop-files/reload-wallpaper.desktop"
+    dest: "{{ item }}"
+  vars:
+    script_path: "{{ apps.scripts_dir }}/reload-wallpaper.sh"
+  loop:
+    - "{{ apps.desktop_dir | quote }}/reload-wallpaper.desktop"
+    - "{{ config.dir }}/autostart/reload-wallpaper.desktop"

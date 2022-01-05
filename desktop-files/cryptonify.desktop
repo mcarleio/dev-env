@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Cryptonify
+Comment=Passwortmanager
+Exec="{{apps.link_dir}}/{{ dependencies.jdk8.symlinked_dir }}/bin/java" -jar {{ app_dir }}/cryptonify.jar
+Icon={{ app_dir }}/cryptonify.png
+Terminal=0
+StartupWMClass=Cryptonify
+Categories=Tools;Java;Application

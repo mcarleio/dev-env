@@ -1,0 +1,23 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Sublime Text
+GenericName=Text Editor
+Comment=Sophisticated text editor for code, markup and prose
+Exec={{ app_dir }}/sublime_text %F
+Terminal=false
+MimeType=text/plain;
+Icon={{ app_dir }}/Icon/256x256/sublime-text.png
+Categories=TextEditor;Development;
+StartupNotify=true
+Actions=new-window;new-file;
+
+[Desktop Action new-window]
+Name=New Window
+Exec={{ app_dir }}/sublime_text --launch-or-new-window
+OnlyShowIn=Unity;
+
+[Desktop Action new-file]
+Name=New File
+Exec={{ app_dir }}/sublime_text --command new_file
+OnlyShowIn=Unity;

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Exec=zsh -c 'sleep 3; {{ script_path }}'
+Terminal=false
+Name=Reload Wallpaper
+Comment=

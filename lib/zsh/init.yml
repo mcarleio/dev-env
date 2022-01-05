@@ -1,0 +1,4 @@
+---
+- include: install-zsh.yml
+- include: install-oh-my-zsh.yml
+- include: install-plugins.yml

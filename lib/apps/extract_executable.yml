@@ -1,0 +1,26 @@
+---
+# Inputs:
+# * app -> apps.list.<theapp>
+# * target_url -> Downloaded URL
+# * _download -> Download result
+# Outputs:
+# * extracted_root -> file name of app under apps.app_dir
+
+##################
+### EXECUTABLE ###
+##################
+
+- name: |
+    If the downloaded file is a single executable file,
+    move it into app directory and make it executable
+  shell: | 
+    mv {{ _download.dest | quote }} {{ (apps.app_dir + '/' + _download.dest | basename) | quote }}
+    chmod +x {{ (apps.app_dir + '/' + _download.dest | basename) | quote }}
+
+- name: Set facts
+  set_fact:
+    extracted_root: "{{ _download.dest | basename }}"
+
+######################
+### END EXECUTABLE ###
+######################

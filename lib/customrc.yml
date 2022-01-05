@@ -1,0 +1,34 @@
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Copy customrc to user home
+  copy:
+    src: "{{ playbook_dir }}/dotfiles/customrc"
+    dest: "{{ config.customrc }}"
+
+- name: Copy aliases to user home
+  copy:
+    src: "{{ playbook_dir }}/dotfiles/aliases"
+    dest: "{{ config.aliases }}"
+
+
+- name: Setup customrc into zshrc
+  lineinfile:
+    path: "{{ config.zshrc }}"
+    line: "source {{ config.customrc }}"
+    state: present
+
+- name: Setup customrc into bashrc
+  lineinfile:
+    path: "{{ config.bashrc }}"
+    line: "source {{ config.customrc }}"
+    state: present
+
+
+- name: Source aliases and path_file in customrc
+  blockinfile:
+    path: "{{ config.customrc }}"
+    insertbefore: "# Custom changes"
+    block: |
+      source {{ apps.path_file }}
+      source {{ config.aliases }}
+    state: present

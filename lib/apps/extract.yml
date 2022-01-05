@@ -1,0 +1,63 @@
+---
+# Inputs:
+# * appname -> Name of the app
+# * app -> apps.list.<appname>
+# * tempdir -> Temporary dir
+# * _download -> Download result
+# Outputs:
+# * extracted_root -> directory name of app under apps.app_dir
+
+
+- name: Set facts
+  set_fact:
+    target_temp_dir: "{{ (tempdir.path + '/' + _download.dest | basename) }}"
+
+### Extract archive
+
+- name: |
+    Create a temporary directory to extract the downloaded compressed
+    file. This is needed, so that the determination of extracted
+    directory name is working correctly.
+  file:
+    path: "{{ target_temp_dir }}"
+    state: directory
+
+- name: Extract downloaded app {{ appname }}
+  unarchive:
+    src: "{{ _download.dest }}"
+    dest: "{{ target_temp_dir }}"
+
+- name: Determine the extracted root directory/file
+  shell: |
+    if [ `ls {{ target_temp_dir | quote }} | wc -l` -gt 1 ];
+    then
+      find {{ target_temp_dir | quote }} -maxdepth 0;
+    else
+      find {{ target_temp_dir | quote }}/* -maxdepth 0;
+    fi
+  # Output:
+  # /path/to/temp/dir/extracted/app_name
+  register: extracted_root_path
+
+- name: Set facts
+  set_fact:
+    extracted_root: "{{ extracted_root_path.stdout | basename }}"
+
+- name: |
+    Ensure the app directory is not existing under the
+    target app directory
+  file:
+    path: "{{ apps.app_dir }}/{{ extracted_root }}"
+    state: absent
+
+- name: Move extracted app into app directory 
+  shell: "mv {{ extracted_root_path.stdout | quote }} {{ (apps.app_dir + '/' + extracted_root) | quote }}"
+
+
+- name: Symlink new apps
+  file:
+    path: "{{ apps.link_dir }}/{{ app.symlinked_dir }}"
+    src: "{{ apps.app_dir }}/{{ extracted_root }}"
+    state: link
+  when:
+    - not (app.single_file | default(false))

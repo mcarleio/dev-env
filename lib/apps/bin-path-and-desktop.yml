@@ -1,0 +1,69 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Ensure PATH file exists
+  file:
+    path: "{{ apps.path_file }}"
+    state: touch
+
+- name: Ensure binaries link directory exists
+  file:
+    path: "{{ apps.binaries_link_dir }}"
+    state: directory
+
+- name: Ensure desktop directory exists
+  file:
+    path: "{{ apps.desktop_dir }}"
+    state: directory
+
+- name: Add binaries link directory to PATH
+  lineinfile:
+    path: "{{ apps.path_file }}"
+    line: "export PATH={{ apps.binaries_link_dir }}:$PATH"
+    state: present
+
+- name: Add bin_path to PATH
+  lineinfile:
+    path: "{{ apps.path_file }}"
+    line: "export PATH={{ apps.link_dir | quote }}/{{ item.symlinked_dir | quote }}/{{ item.bin_path | quote }}:$PATH"
+    state: present
+  loop: "{{ apps.list.values() }}"
+  when: item.bin_path is defined
+
+- name: Link binaries to binaries link directory
+  file:
+    path: "{{ apps.binaries_link_dir | quote }}/{{ item[1] | basename | quote }}"
+    src: "{{ apps.link_dir | quote }}/{{ item[0].symlinked_dir | quote }}/{{ item[1] | quote }}"
+    state: link
+  # => item[0] = config object (from vars), item[1] = current binaries
+  loop: "{{ apps.list.values() | selectattr('binaries', 'defined') | subelements('binaries') | list }}" 
+  when: 
+    - not item[0].executable | default(false)
+    - not item[0].single_file | default(false)
+
+- name: Link executables to binaries link directory
+  file:
+    path: "{{ apps.binaries_link_dir | quote }}/{{ item.url | basename | quote }}"
+    src: "{{ apps.app_dir | quote }}/{{ item.url | basename | quote }}"
+    state: link
+  loop: "{{ apps.list.values() }}"
+  when: item.executable | default(false)
+
+- name: Link single files to binaries link directory
+  file:
+    path: "{{ apps.binaries_link_dir | quote }}/{{ item.single_file | basename | quote }}"
+    src: "{{ apps.app_dir | quote }}/{{ item.single_file | basename | quote }}"
+    state: link
+  loop: "{{ apps.list.values() }}"
+  when: item.single_file | default(false)
+
+- name: Add desktop file
+  template:
+    src: "{{ playbook_dir }}/desktop-files/{{ item.desktop_file | quote }}"
+    dest: "{{ apps.desktop_dir | quote }}/{{ item.desktop_file | quote }}"
+  vars:
+    bin_dir: "{{ apps.link_dir | quote }}/{{ item.symlinked_dir | quote }}/{{ item.bin_path |d('') | quote }}"
+    app_dir: "{{ apps.link_dir | quote }}/{{ item.symlinked_dir | quote }}"
+    dependencies: "{{ dict( item.dependsOn | d([]) | zip( item.dependsOn | d([]) | map('extract', apps.list) )) }}"
+  loop: "{{ apps.list.values() }}"
+  when: item.desktop_file is defined
