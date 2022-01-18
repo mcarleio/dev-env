@@ -1,6 +1,8 @@
 ---
- - include: idea.yml
- - include: sublime.yml
- - include: gnome.yml
- - include: guake.yml
- - include: system.yml
+ - import_tasks: idea.yml
+ - import_tasks: sublime.yml
+ - import_tasks: gnome.yml
+ - import_tasks: guake.yml
+ - import_tasks: system.yml
+ - import_tasks: docker.yml
+ - import_tasks: git-projects.yml

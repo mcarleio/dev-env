@@ -1,0 +1,17 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Checkout GitHub projects
+  git:
+    repo: "https://github.com/mcarleio/{{ item }}.git"
+    dest: "{{ config.projects_folder }}/{{ item }}"
+    update: no
+  loop: "{{ github_projects }}"
+
+- name: Change remote to ssh
+  git_config:
+    repo: "{{ config.projects_folder}}/{{ item }}"
+    scope: local
+    name: "remote.origin.url"
+    value: "git@github.com:mcarleio/{{ item }}.git"
+  loop: "{{ github_projects }}"

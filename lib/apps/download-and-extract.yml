@@ -29,7 +29,7 @@
     state: touch
 
 - name: Download and extract apps
-  include: lib/apps/download-and-extract-app.yml
+  include_tasks: lib/apps/download-and-extract-app.yml
   loop: "{{ apps.list | dict2items }}"
   loop_control:
     loop_var: _app_dict

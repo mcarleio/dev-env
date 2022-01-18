@@ -1,6 +1,6 @@
 
 packages:
-  - name: python3-psutil
+  - name: python3-psutil # for ansible to use dconf
     pacman: [python-psutil]
   - name: git 
   - name: zsh 
@@ -13,6 +13,10 @@ packages:
   - name: xclip # copy output from cli into clipboard
   - name: vim # command line editor
   - name: meld # diff tool
+  - name: flatpak # Flatpak as alternative for package managers like dnf, apt and pacman
+  - name: xorg-xkill # kill windows with mouse click
+    dnf: [xkill]
+    apt: []
   - name: mtr # network tool
   - name: xrandr # display tool
     apt: [mtr-tiny]
@@ -40,6 +44,17 @@ packages:
   # TODO: Finally decide for email client: Thunderbird, Geary, ...
   - name: thunderbird
 
+  - name: signal-desktop
+    pacman: [signal-desktop]
+    dnf: []
+    apt: []
+
+flatpaks:
+  - name: org.signal.Signal
+    pacman: no
+    dnf: yes
+    apt: yes
+
 repositories:
   dnf:
     - name: VSCodium
@@ -64,6 +79,13 @@ repositories:
 
   pacman: []
 
+github_projects:
+  - cv
+  - dev-env
+  - sciurus
+  - sciurus-cache-redis
+  - strix
+  - website
 
 config:
   dir: "{{ ansible_env.HOME }}/.config"
@@ -71,6 +93,8 @@ config:
   bashrc: "{{ ansible_env.HOME }}/.bashrc"
   customrc: "{{ ansible_env.HOME }}/.customrc"
   aliases: "{{ ansible_env.HOME }}/.custom_aliases"
+
+  projects_folder: "{{ ansible_env.HOME }}/IdeaProjects/mcarleio"
   
   # TODO: Check if some own temp dir is really necessary
   temp: "/opt/.tmp" # Not using /tmp, as it could be defined to small 
@@ -80,6 +104,18 @@ config:
   git:
     name: "Marcel Carlé"
     email: "hi-github@mcarle.io"
+
+  gnome:
+    favorites:
+      - name: org.gnome.Nautilus.desktop
+      - name: chromium.desktop
+        apt: chromium_chromium.desktop
+        dnf: chromium-browser.desktop
+      - name: jetbrains-idea.desktop
+      - name: sublime_text.desktop
+      - name: org.gnome.Terminal.desktop
+      - name: codium.desktop
+      - name: cryptonify.desktop
 
 ohmyzsh:
   install:
@@ -166,3 +202,14 @@ apps:
 
 ref:
   app_linkdir: *app_linkdir
+
+# TODO: Define further manual steps
+further_steps_text: |
+  <span color="green" size="large"><b>Successfully</b></span> finished the <i>dev-env</i> setup!
+
+  Please perform the following manual steps:
+  1. Update firmware(s): fwupdmgr update
+  2. Upload SSH public key to e.g. GitHub 
+  3. Check for tiling window tools (e.g. Pop Shell for GNOME Shell)
+  4. ...
+  5. Reboot

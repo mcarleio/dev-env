@@ -1,6 +1,7 @@
 ---
 - include_vars: "{{ playbook_dir }}/vars.yml"
 
+# TODO: dconf vs gsettings? (see guake.yml)
 - name: Disable Ctrl+Alt+Left in GNOME Shell
   shell: gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Super>Page_Up', '<Super><Alt>Left']"
 
@@ -17,4 +18,8 @@
   shell: gsettings set org.gnome.desktop.calendar show-weekdate true
 
 - name: Set favorites for GNOME shell
-  shell: gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'chromium-browser.desktop', 'jetbrains-idea.desktop', 'sublime_text.desktop', 'org.gnome.Terminal.desktop', 'codium.desktop', 'cryptonify.desktop']"
+  shell: gsettings set org.gnome.shell favorite-apps "{{ favorite_apps }}"
+  vars:
+    # TODO: Keep original order while mapping
+    # Map elements to array of OS dependent strings, i.e., ['xyz', 'abc']
+    favorite_apps: "{{ config.gnome.favorites | selectattr(ansible_pkg_mgr, 'undefined') | map(attribute='name') + config.gnome.favorites | selectattr(ansible_pkg_mgr, 'defined') | map(attribute=ansible_pkg_mgr) }}"

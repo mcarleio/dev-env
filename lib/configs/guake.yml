@@ -6,6 +6,7 @@
   #shell: "guake --restore-preferences={{ playbook_dir }}/config/guake.conf"
   shell: "dconf load /apps/guake/ < '{{ playbook_dir }}/config/guake.conf'"
 
+# TODO: dconf vs gsettings? (see gnome.yml)
 - name: Manual keybinding for guake (to overcome problems with wayland) # see https://github.com/Guake/guake/issues/1642
   dconf:
     key: "{{ item.key }}"

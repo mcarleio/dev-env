@@ -1,16 +1,6 @@
 ---
 - include_vars: "{{ playbook_dir }}/vars.yml"
 
-- name: Install zsh and git
-  become: yes
-  package:
-    name: "{{ item }}"
-    state: present
-  with_items: 
-    - zsh
-    - git
-    - util-linux-user # chsh
-
 - name: Set zsh as default sh
   become: yes
   shell: "chsh -s $(which zsh) {{ the_user }}"

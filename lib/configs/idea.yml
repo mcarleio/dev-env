@@ -1,8 +1,6 @@
 ---
 - include_vars: "{{ playbook_dir }}/vars.yml"
 
-
-
 - name: Create config dir for IntelliJ IDEA
   file:
     path: "{{ apps.list.idea.config_dir }}/{{ item.path }}"

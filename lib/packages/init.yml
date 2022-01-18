@@ -1,4 +1,4 @@
 ---
- - include: setup-repos.yml
- - include: update-packages.yml
- - include: install-packages.yml
+ - import_tasks: setup-repos.yml
+ - import_tasks: update-packages.yml
+ - import_tasks: install-packages.yml

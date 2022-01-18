@@ -108,13 +108,13 @@
 
 ### Extract (either or)
 - name: Extract executable app {{ appname }}
-  include: extract_executable.yml
+  import_tasks: extract_executable.yml
   when:
     - not app_installed
     - app.executable | default(false) 
 
 - name: Extract app {{ appname }}
-  include: extract.yml
+  import_tasks: extract.yml
   when:
     - not app_installed
     - not (app.executable | default(false))

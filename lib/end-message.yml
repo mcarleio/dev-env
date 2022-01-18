@@ -1,0 +1,5 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Show end message with manual steps
+  shell: zenity --info --width 500 --text '{{ further_steps_text }}' &

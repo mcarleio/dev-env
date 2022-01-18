@@ -1,2 +1,15 @@
-# TODO: Add user to docker group to allow running docker without sudo
-# TODO: Start docker service on startup
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Add user to docker group
+  become: yes
+  user:
+    name: "{{ ansible_env.USER }}"
+    groups: docker
+    append: yes
+
+- name: Autostart docker service
+  become: yes
+  systemd:
+    name: docker
+    enabled: yes

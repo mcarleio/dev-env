@@ -1,14 +1,17 @@
 ---
 - hosts: localhost
   tasks:
-    - include: lib/packages/init.yml
-    - include: lib/apps/init.yml
-    - include: lib/zsh/init.yml
-    - include: lib/configs/init.yml
+    - import_tasks: lib/packages/init.yml
+    - import_tasks: lib/flatpak/init.yml
+    - import_tasks: lib/apps/init.yml
+    - import_tasks: lib/zsh/init.yml
+    - import_tasks: lib/configs/init.yml
     
-    - include: lib/customrc.yml
-    - include: lib/git.yml
-    - include: lib/fonts.yml
+    - import_tasks: lib/customrc.yml
+    - import_tasks: lib/git.yml
+    - import_tasks: lib/fonts.yml
 
-    - include: lib/scripts.yml
-    - include: lib/reload-wallpaper.yml
+    - import_tasks: lib/scripts.yml
+    - import_tasks: lib/reload-wallpaper.yml
+
+    - import_tasks: lib/end-message.yml

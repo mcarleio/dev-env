@@ -1,0 +1,9 @@
+---
+- include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Install flatpaks
+  become: yes
+  flatpak:
+    name: "{{ item.name }}"
+  when: item[ansible_pkg_mgr] | default(no)
+  loop: "{{ flatpaks }}"
