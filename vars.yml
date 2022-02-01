@@ -146,9 +146,11 @@ apps:
       bin_path: bin
     jdk11:
       url: https://api.sdkman.io/2/broker/download/java/11.0.13-zulu/linuxx64
+      url_unversioned: yes
       symlinked_dir: jdk11
     jdk8:
       url: https://api.sdkman.io/2/broker/download/java/8.0.312-zulu/linuxx64
+      url_unversioned: yes
       symlinked_dir: jdk8
     graalvm-jdk17:
       url: https://api.sdkman.io/2/broker/download/java/21.3.0.r17-grl/linuxx64
