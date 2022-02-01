@@ -41,6 +41,10 @@ packages:
   - name: chromium
     apt: [chromium-browser, chromium-browser-l10n, chromium-codecs-ffmpeg, chromium-codecs-ffmpeg-extra]
 
+  - name: atom
+    dnf: [ ] # will be installed via flatpak
+    apt: [ ] # will be installed via flatpak
+
   # TODO: Finally decide for email client: Thunderbird, Geary, ...
   - name: thunderbird
 
@@ -49,6 +53,11 @@ packages:
     apt: [] # will be installed via flatpak
 
 flatpaks:
+  - name: io.atom.Atom
+      pacman: no
+      dnf: yes
+      apt: yes
+
   - name: org.signal.Signal
     pacman: no
     dnf: yes
@@ -111,6 +120,8 @@ config:
         apt: chromium_chromium.desktop
         dnf: chromium-browser.desktop
       - name: jetbrains-idea.desktop
+      - name: io.atom.Atom.desktop
+        pacman: atom.desktop
       - name: org.gnome.Terminal.desktop
       - name: codium.desktop
       - name: cryptonify.desktop
