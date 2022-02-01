@@ -3,6 +3,5 @@
 
 - name: Setup Flathub repository
   become: yes
-  flatpak_remote:
-    name: flathub
-    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+  shell: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+#  flatpak_remote does not work everytime
