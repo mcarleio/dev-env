@@ -112,7 +112,6 @@ config:
         apt: chromium_chromium.desktop
         dnf: chromium-browser.desktop
       - name: jetbrains-idea.desktop
-      - name: sublime_text.desktop
       - name: org.gnome.Terminal.desktop
       - name: codium.desktop
       - name: cryptonify.desktop
@@ -183,11 +182,6 @@ apps:
       desktop_file: jetbrains-idea.desktop
       # TODO: This is only here, as when changing the url (version), one need to amend this config as well
       config_dir: "{{ config.dir }}/JetBrains/IntelliJIdea2021.3"
-    sublime:
-      url: https://download.sublimetext.com/sublime_text_build_4126_x64.tar.xz
-      symlinked_dir: sublime
-      desktop_file: sublime_text.desktop
-      binaries: ["sublime_text"]
     terraform:
       url: https://releases.hashicorp.com/terraform/1.1.2/terraform_1.1.2_linux_amd64.zip
       single_file: terraform

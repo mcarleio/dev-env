@@ -1,6 +1,5 @@
 ---
  - import_tasks: idea.yml
- - import_tasks: sublime.yml
  - import_tasks: gnome.yml
  - import_tasks: guake.yml
  - import_tasks: system.yml
