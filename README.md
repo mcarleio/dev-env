@@ -2,7 +2,7 @@
 With the help of this repository, I setup and update my development environment.
 
 ## Requirements
-Install ansible (min. ansible-playbook version 2.10.16).
+Install ansible **>= 2.10**: 
 
 ```
 # Fedora
