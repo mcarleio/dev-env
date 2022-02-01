@@ -45,9 +45,8 @@ packages:
   - name: thunderbird
 
   - name: signal-desktop
-    pacman: [signal-desktop]
-    dnf: []
-    apt: []
+    dnf: [] # will be installed via flatpak
+    apt: [] # will be installed via flatpak
 
 flatpaks:
   - name: org.signal.Signal
@@ -143,7 +142,6 @@ apps:
     jdk17:
       url: https://api.sdkman.io/2/broker/download/java/17.0.1-zulu/linuxx64
       url_unversioned: yes
-      basename: ansible-jdk17.tar.gz
       symlinked_dir: jdk17
       bin_path: bin
     jdk11:
