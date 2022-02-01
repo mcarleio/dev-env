@@ -33,9 +33,9 @@ packages:
     apt: [docker-ce, docker-ce-cli, containerd.io, docker-compose] 
 
   - name: vscodium
-    pacman: [vscodium-bin]
-    dnf: [codium]
-    apt: [codium]
+    pacman: [vscodium-bin] # Needs to be defined here to use yay to install from AUR
+    dnf: [] # will be installed via flatpak
+    apt: [] # will be installed via flatpak
 
   # TODO: Finally decide for browser: Chromium, Brave, Vivaldi, Opera, ...
   - name: chromium
@@ -63,23 +63,17 @@ flatpaks:
     dnf: yes
     apt: yes
 
+  - name: com.vscodium.codium
+    pacman: no
+    dnf: yes
+    apt: yes
+
 repositories:
   dnf:
-    - name: VSCodium
-      desc: "VS Codium"
-      gpg: https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
-      baseurl: https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/
-
     - name: Docker
       repo: https://download.docker.com/linux/fedora/docker-ce.repo
 
   apt:
-    - name: VSCodium
-      gpg: https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
-      baseurl: https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/debs
-      distribution: vscodium
-      components: main
-
     - name: Docker
       gpg: https://download.docker.com/linux/ubuntu/gpg
       baseurl: https://download.docker.com/linux/ubuntu
@@ -123,7 +117,8 @@ config:
       - name: io.atom.Atom.desktop
         pacman: atom.desktop
       - name: org.gnome.Terminal.desktop
-      - name: codium.desktop
+      - name: com.vscodium.codium.desktop
+        pacman: codium.desktop
       - name: cryptonify.desktop
 
 ohmyzsh:
