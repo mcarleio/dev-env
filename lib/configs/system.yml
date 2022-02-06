@@ -1,5 +1,5 @@
 - name: Increase inotify file watch limit
   become: yes
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/sysctl.d/98-fsinotifymax.conf"
     content: fs.inotify.max_user_watches = 524288

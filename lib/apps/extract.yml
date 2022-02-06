@@ -9,7 +9,7 @@
 
 
 - name: Set facts
-  set_fact:
+  ansible.builtin.set_fact:
     target_temp_dir: "{{ (tempdir.path + '/' + _download.dest | basename) }}"
 
 ### Extract archive
@@ -18,17 +18,17 @@
     Create a temporary directory to extract the downloaded compressed
     file. This is needed, so that the determination of extracted
     directory name is working correctly.
-  file:
+  ansible.builtin.file:
     path: "{{ target_temp_dir }}"
     state: directory
 
 - name: Extract downloaded app {{ appname }}
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ _download.dest }}"
     dest: "{{ target_temp_dir }}"
 
 - name: Determine the extracted root directory/file
-  shell: |
+  ansible.builtin.shell: |
     if [ `ls {{ target_temp_dir | quote }} | wc -l` -gt 1 ];
     then
       find {{ target_temp_dir | quote }} -maxdepth 0;
@@ -40,22 +40,22 @@
   register: extracted_root_path
 
 - name: Set facts
-  set_fact:
+  ansible.builtin.set_fact:
     extracted_root: "{{ extracted_root_path.stdout | basename }}"
 
 - name: |
     Ensure the app directory is not existing under the
     target app directory
-  file:
+  ansible.builtin.file:
     path: "{{ apps.app_dir }}/{{ extracted_root }}"
     state: absent
 
 - name: Move extracted app into app directory 
-  shell: "mv {{ extracted_root_path.stdout | quote }} {{ (apps.app_dir + '/' + extracted_root) | quote }}"
+  ansible.builtin.shell: "mv {{ extracted_root_path.stdout | quote }} {{ (apps.app_dir + '/' + extracted_root) | quote }}"
 
 
 - name: Symlink new apps
-  file:
+  ansible.builtin.file:
     path: "{{ apps.link_dir }}/{{ app.symlinked_dir }}"
     src: "{{ apps.app_dir }}/{{ extracted_root }}"
     state: link

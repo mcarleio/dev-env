@@ -1,29 +1,29 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Ensure PATH file exists
-  file:
+  ansible.builtin.file:
     path: "{{ apps.path_file }}"
     state: touch
 
 - name: Ensure binaries link directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ apps.binaries_link_dir }}"
     state: directory
 
 - name: Ensure desktop directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ apps.desktop_dir }}"
     state: directory
 
 - name: Add binaries link directory to PATH
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ apps.path_file }}"
     line: "export PATH={{ apps.binaries_link_dir }}:$PATH"
     state: present
 
 - name: Add bin_path to PATH
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ apps.path_file }}"
     line: "export PATH={{ apps.link_dir | quote }}/{{ item.symlinked_dir | quote }}/{{ item.bin_path | quote }}:$PATH"
     state: present
@@ -31,7 +31,7 @@
   when: item.bin_path is defined
 
 - name: Link binaries to binaries link directory
-  file:
+  ansible.builtin.file:
     path: "{{ apps.binaries_link_dir | quote }}/{{ item[1] | basename | quote }}"
     src: "{{ apps.link_dir | quote }}/{{ item[0].symlinked_dir | quote }}/{{ item[1] | quote }}"
     state: link
@@ -42,7 +42,7 @@
     - not item[0].single_file | default(false)
 
 - name: Link executables to binaries link directory
-  file:
+  ansible.builtin.file:
     path: "{{ apps.binaries_link_dir | quote }}/{{ item.url | basename | quote }}"
     src: "{{ apps.app_dir | quote }}/{{ item.url | basename | quote }}"
     state: link
@@ -50,7 +50,7 @@
   when: item.executable | default(false)
 
 - name: Link single files to binaries link directory
-  file:
+  ansible.builtin.file:
     path: "{{ apps.binaries_link_dir | quote }}/{{ item.single_file | basename | quote }}"
     src: "{{ apps.app_dir | quote }}/{{ item.single_file | basename | quote }}"
     state: link
@@ -58,7 +58,7 @@
   when: item.single_file | default(false)
 
 - name: Add desktop file
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/desktop-files/{{ item.desktop_file | quote }}"
     dest: "{{ apps.desktop_dir | quote }}/{{ item.desktop_file | quote }}"
   vars:

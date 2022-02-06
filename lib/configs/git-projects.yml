@@ -1,15 +1,15 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Checkout GitHub projects
-  git:
+  ansible.builtin.git:
     repo: "https://github.com/mcarleio/{{ item }}.git"
     dest: "{{ config.projects_folder }}/{{ item }}"
     update: no
   loop: "{{ github_projects }}"
 
 - name: Change remote to ssh
-  git_config:
+  community.general.git_config:
     repo: "{{ config.projects_folder}}/{{ item }}"
     scope: local
     name: "remote.origin.url"

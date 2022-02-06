@@ -1,11 +1,11 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Set GIT core.autocrlf global setting
-  shell: "git config --global core.autocrlf input"
+  ansible.builtin.shell: "git config --global core.autocrlf input"
 
 - name: Set GIT user.name global setting
-  shell: "git config --global user.name '{{ config.git.name }}'"
+  ansible.builtin.shell: "git config --global user.name '{{ config.git.name }}'"
 
 - name: Set GIT user.email global setting
-  shell: "git config --global user.email {{ config.git.email }}"
+  ansible.builtin.shell: "git config --global user.email {{ config.git.email }}"

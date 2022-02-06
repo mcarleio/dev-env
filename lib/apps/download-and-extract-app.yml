@@ -3,7 +3,7 @@
 # Var: app -> apps.list.<appname>
 
 - name: Clear facts
-  set_fact:
+  ansible.builtin.set_fact:
     target_url:
     target_foldername:
     app_installed:
@@ -11,13 +11,13 @@
     target_temp_dir:
 
 - name: Create temporary download directory
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
     path: "{{ config.temp }}"
   register: tempdownload
 
 - name: Create temporary directory
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
     path: "{{ config.temp }}"
   register: tempdir
@@ -30,7 +30,7 @@
     If the URL does not contain the specific version of the app,
     make a HEAD call, to (hopefully) get the target URL incl. some
     specific version
-  uri:
+  ansible.builtin.uri:
     url: "{{ app.url }}"
     method: HEAD
   register: _uri
@@ -45,22 +45,22 @@
 - name: |
     Extract the target_url from either the previously loaded URL
     or from the configured URL.
-  set_fact:
+  ansible.builtin.set_fact:
     target_url: "{{ _uri.url | default(app.url) }}"
 
 - name: |
     Check, if the app was already installed. If yes, it returns
     the installed folder name.
-  shell: "(grep -F {{ (target_url + ' ::: ') | quote }} {{ apps.installed_file | quote }} || true) | awk -F ' ::: ' '{print $2}'"
+  ansible.builtin.shell: "(grep -F {{ (target_url + ' ::: ') | quote }} {{ apps.installed_file | quote }} || true) | awk -F ' ::: ' '{print $2}'"
   register: _grep
 
 - name: Set facts
-  set_fact:
+  ansible.builtin.set_fact:
     target_foldername: "{{ _grep.stdout }}"
   when: _grep.stdout | length > 0
 
 - name: Check if the app is still installed
-  stat:
+  ansible.builtin.stat:
     path: "{{ apps.app_dir }}/{{ target_foldername }}"
   # Output:
   #   stat.exists => shows if installed app still exists
@@ -68,14 +68,14 @@
   register: _stat
 
 - name: Set facts
-  set_fact:
+  ansible.builtin.set_fact:
     app_installed: "{{ _stat.stat.exists | default(false) }}"  
 
 ### If app is installed, update symlinks
 - name: |
     Update the symlinks of existing apps
     (e.g. in case of version switch)
-  file:
+  ansible.builtin.file:
     path: "{{ apps.link_dir }}/{{ app.symlinked_dir }}"
     src: "{{ apps.app_dir }}/{{ target_foldername }}"
     state: link
@@ -88,7 +88,7 @@
 - name: |
     If the app is not installed anymore, remove the line from
     the {{ apps.installed_file }} file
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ apps.installed_file }}"
     search_string: "{{ target_url }} ::: "
     state: absent
@@ -98,7 +98,7 @@
 
 ### Download
 - name: Download the app {{ appname }}
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ target_url }}"
     dest: "{{ tempdownload.path }}"
   when: 
@@ -108,13 +108,13 @@
 
 ### Extract (either or)
 - name: Extract executable app {{ appname }}
-  import_tasks: extract_executable.yml
+  ansible.builtin.import_tasks: extract_executable.yml
   when:
     - not app_installed
     - app.executable | default(false) 
 
 - name: Extract app {{ appname }}
-  import_tasks: extract.yml
+  ansible.builtin.import_tasks: extract.yml
   when:
     - not app_installed
     - not (app.executable | default(false))
@@ -123,7 +123,7 @@
 - name: |
     Protocol the (actual) URL and the name of the extracted folder
     or single executable
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ apps.installed_file }}"
     line: "{{ target_url }} ::: {{ extracted_root }}"
     state: present
@@ -131,11 +131,11 @@
     - not app_installed
 
 - name: Cleanup temporary files
-  file:
+  ansible.builtin.file:
     path: "{{ tempdownload.path }}"
     state: absent
 
 - name: Cleanup temporary files
-  file:
+  ansible.builtin.file:
     path: "{{ tempdir.path }}"
     state: absent

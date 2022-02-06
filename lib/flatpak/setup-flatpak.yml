@@ -1,7 +1,6 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Setup Flathub repository
   become: yes
-  shell: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  ansible.builtin.shell: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 #  flatpak_remote does not work everytime

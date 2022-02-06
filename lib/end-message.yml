@@ -1,5 +1,5 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Show end message with manual steps
-  shell: zenity --info --width 500 --text '{{ further_steps_text }}' &
+  ansible.builtin.shell: zenity --info --width 500 --text '{{ further_steps_text }}' &

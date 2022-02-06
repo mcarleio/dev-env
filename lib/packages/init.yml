@@ -1,4 +1,4 @@
 ---
- - import_tasks: setup-repos.yml
- - import_tasks: update-packages.yml
- - import_tasks: install-packages.yml
+ - ansible.builtin.import_tasks: setup-repos.yml
+ - ansible.builtin.import_tasks: update-packages.yml
+ - ansible.builtin.import_tasks: install-packages.yml

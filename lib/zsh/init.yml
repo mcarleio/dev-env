@@ -1,4 +1,4 @@
 ---
-- import_tasks: set-default-zsh.yml
-- import_tasks: install-oh-my-zsh.yml
-- import_tasks: install-plugins.yml
+- ansible.builtin.import_tasks: set-default-zsh.yml
+- ansible.builtin.import_tasks: install-oh-my-zsh.yml
+- ansible.builtin.import_tasks: install-plugins.yml

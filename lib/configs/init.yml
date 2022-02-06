@@ -1,7 +1,7 @@
 ---
- - import_tasks: idea.yml
- - import_tasks: gnome.yml
- - import_tasks: guake.yml
- - import_tasks: system.yml
- - import_tasks: docker.yml
- - import_tasks: git-projects.yml
+ - ansible.builtin.import_tasks: idea.yml
+ - ansible.builtin.import_tasks: gnome.yml
+ - ansible.builtin.import_tasks: guake.yml
+ - ansible.builtin.import_tasks: system.yml
+ - ansible.builtin.import_tasks: docker.yml
+ - ansible.builtin.import_tasks: git-projects.yml

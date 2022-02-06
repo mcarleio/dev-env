@@ -1,8 +1,8 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Set zsh as default sh
   become: yes
-  shell: "chsh -s $(which zsh) {{ the_user }}"
+  ansible.builtin.shell: "chsh -s $(which zsh) {{ the_user }}"
   vars:
     the_user: "{{ ansible_user_id }}"

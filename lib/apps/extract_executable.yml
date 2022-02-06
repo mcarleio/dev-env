@@ -13,12 +13,12 @@
 - name: |
     If the downloaded file is a single executable file,
     move it into app directory and make it executable
-  shell: | 
+  ansible.builtin.shell: | 
     mv {{ _download.dest | quote }} {{ (apps.app_dir + '/' + _download.dest | basename) | quote }}
     chmod +x {{ (apps.app_dir + '/' + _download.dest | basename) | quote }}
 
 - name: Set facts
-  set_fact:
+  ansible.builtin.set_fact:
     extracted_root: "{{ _download.dest | basename }}"
 
 ######################

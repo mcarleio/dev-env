@@ -1,15 +1,15 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Add user to docker group
   become: yes
-  user:
+  ansible.builtin.user:
     name: "{{ ansible_env.USER }}"
     groups: docker
     append: yes
 
 - name: Autostart docker service
   become: yes
-  systemd:
+  ansible.builtin.systemd:
     name: docker
     enabled: yes

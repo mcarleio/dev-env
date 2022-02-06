@@ -1,12 +1,12 @@
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Create {{ apps.scripts_dir }}
-  file:
+  ansible.builtin.file:
     path: "{{ apps.scripts_dir }}"
     state: directory
 
 - name: Copies scripts into {{ apps.scripts_dir }}
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ apps.scripts_dir }}/{{ item | basename }}"
     mode: u+x

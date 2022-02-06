@@ -1,35 +1,35 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Change owner of {{ apps.link_dir }}
   become: yes
-  file:
+  ansible.builtin.file:
     path: "{{ apps.link_dir }}"
     state: directory
     owner: "{{ ansible_env.USER }}"
 
 - name: Create custom temp directory {{ config.temp }}
-  file:
+  ansible.builtin.file:
     path: "{{ config.temp }}"
     state: directory
 
 - name: Ensure app directory exists {{ apps.app_dir }}
-  file:
+  ansible.builtin.file:
     path: "{{ apps.app_dir }}"
     state: directory
 
 - name: Ensure install protocol exists {{ apps.installed_file }}
-  file:
+  ansible.builtin.file:
     path: "{{ apps.installed_file }}"
     state: touch
 
 - name: Ensure PATH file exists {{ apps.path_file }}
-  file:
+  ansible.builtin.file:
     path: "{{ apps.path_file }}"
     state: touch
 
 - name: Download and extract apps
-  include_tasks: lib/apps/download-and-extract-app.yml
+  ansible.builtin.include_tasks: lib/apps/download-and-extract-app.yml
   loop: "{{ apps.list | dict2items }}"
   loop_control:
     loop_var: _app_dict
@@ -38,6 +38,6 @@
     app: "{{ _app_dict.value }}"
 
 - name: Delete custom temp directory {{ config.temp }}
-  file:
+  ansible.builtin.file:
     path: "{{ config.temp }}"
     state: absent

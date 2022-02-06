@@ -3,21 +3,21 @@
 
 - name: Update installed pacman packages
   become: yes
-  pacman:
+  community.general.pacman:
     update_cache: yes
     upgrade: yes
   when: ansible_pkg_mgr == "pacman"
 
 - name: Update installed dnf packages
   become: yes
-  dnf:
+  ansible.builtin.dnf:
     name: "*"
     state: latest
   when: ansible_pkg_mgr == "dnf"
 
 - name: Update installed apt packages
   become: yes
-  apt:
+  ansible.builtin.apt:
     name: "*"
     state: latest
   when: ansible_pkg_mgr == "apt"

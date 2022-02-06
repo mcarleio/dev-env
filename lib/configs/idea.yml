@@ -1,8 +1,8 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Create config dir for IntelliJ IDEA
-  file:
+  ansible.builtin.file:
     path: "{{ apps.list.idea.config_dir }}/{{ item.path }}"
     state: directory
     recurse: yes
@@ -10,7 +10,7 @@
   when: item.state == 'directory'
 
 - name: Copy config files to IntelliJ IDEA
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ apps.list.idea.config_dir }}/{{ item.path }}"
   loop: "{{ lookup('filetree', playbook_dir + '/config/idea/') }}"

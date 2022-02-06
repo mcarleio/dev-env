@@ -1,10 +1,10 @@
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Create autostart desktop files folder
-  file: path={{ config.dir }}/autostart state=directory
+  ansible.builtin.file: path={{ config.dir }}/autostart state=directory
 
 - name: Add desktop file for reload-wallpaper.sh
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/desktop-files/reload-wallpaper.desktop"
     dest: "{{ item }}"
   vars:

@@ -1,24 +1,24 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 # TODO: dconf vs gsettings? (see guake.yml)
 - name: Disable Ctrl+Alt+Left in GNOME Shell
-  shell: gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Super>Page_Up', '<Super><Alt>Left']"
+  ansible.builtin.shell: gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Super>Page_Up', '<Super><Alt>Left']"
 
 - name: Disable Ctrl+Alt+Right in GNOME Shell
-  shell: gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Super>Page_Down', '<Super><Alt>Right']"
+  ansible.builtin.shell: gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Super>Page_Down', '<Super><Alt>Right']"
 
 - name: Show weekday in GNOME Shell
-  shell: gsettings set org.gnome.desktop.interface clock-show-weekday true
+  ansible.builtin.shell: gsettings set org.gnome.desktop.interface clock-show-weekday true
 
 - name: Show battery percentage in GNOME Shell
-  shell: gsettings set org.gnome.desktop.interface show-battery-percentage true
+  ansible.builtin.shell: gsettings set org.gnome.desktop.interface show-battery-percentage true
 
 - name: Show week number in calendar in GNOME Shell
-  shell: gsettings set org.gnome.desktop.calendar show-weekdate true
+  ansible.builtin.shell: gsettings set org.gnome.desktop.calendar show-weekdate true
 
 - name: Set favorites for GNOME shell
-  shell: gsettings set org.gnome.shell favorite-apps "{{ favorite_apps }}"
+  ansible.builtin.shell: gsettings set org.gnome.shell favorite-apps "{{ favorite_apps }}"
   vars:
     # TODO: Keep original order while mapping
     # Map elements to array of OS dependent strings, i.e., ['xyz', 'abc']

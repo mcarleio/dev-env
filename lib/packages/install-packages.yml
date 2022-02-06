@@ -1,16 +1,16 @@
 ---
-- include_vars: "{{ playbook_dir }}/vars.yml"
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Install common packages
   become: yes
-  package:
+  ansible.builtin.package:
     name: "{{ item.name }}"
     state: present
   loop: "{{ packages }}"
   when: not item[ansible_pkg_mgr] is defined
 
 - name: Install pacman packages
-  pacman:
+  community.general.pacman:
     name: "{{ item }}"
     executable: yay
     state: present
@@ -19,7 +19,7 @@
 
 - name: Install dnf packages
   become: yes
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ item }}"
     state: present
   loop: "{{ packages | selectattr(ansible_pkg_mgr, 'defined') | map(attribute=ansible_pkg_mgr) | flatten }}"
@@ -27,7 +27,7 @@
 
 - name: Install apt packages
   become: yes
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop: "{{ packages | selectattr(ansible_pkg_mgr, 'defined') | map(attribute=ansible_pkg_mgr) | flatten }}"
