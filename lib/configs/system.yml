@@ -1,3 +1,4 @@
+---
 - name: Increase inotify file watch limit
   become: yes
   ansible.builtin.copy:

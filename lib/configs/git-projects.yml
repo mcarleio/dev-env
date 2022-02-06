@@ -14,4 +14,5 @@
     scope: local
     name: "remote.origin.url"
     value: "git@github.com:mcarleio/{{ item }}.git"
+    state: present
   loop: "{{ github_projects }}"

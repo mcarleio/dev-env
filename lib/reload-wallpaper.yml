@@ -1,7 +1,9 @@
 - ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
 
 - name: Create autostart desktop files folder
-  ansible.builtin.file: path={{ config.dir }}/autostart state=directory
+  ansible.builtin.file:
+    path: "{{ config.dir }}/autostart"
+    state: directory
 
 - name: Add desktop file for reload-wallpaper.sh
   ansible.builtin.template:

@@ -6,6 +6,7 @@
   community.general.pacman:
     update_cache: yes
     upgrade: yes
+    state: latest
   when: ansible_pkg_mgr == "pacman"
 
 - name: Update installed dnf packages

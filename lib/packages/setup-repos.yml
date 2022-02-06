@@ -21,6 +21,7 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: yes
     gpgkey: "{{ item.gpg }}"
+    state: present
   loop: "{{ repositories[ansible_pkg_mgr] }}"
   when: ansible_pkg_mgr == "dnf" and not item.repo is defined
 
@@ -68,5 +69,6 @@
   become: yes
   ansible.builtin.apt_repository:
     repo: deb [ signed-by=/usr/share/keyrings/{{ item.name | lower }}-keyring.gpg ] {{ item.baseurl }} {{ item.distribution | d(_APT_OS_DISTRIBUTION.stdout) }} {{ item.components }}
+    state: present
   loop: "{{ repositories[ansible_pkg_mgr] }}"
   when: ansible_pkg_mgr == "apt"

@@ -6,6 +6,7 @@
   ansible.builtin.user:
     name: "{{ ansible_env.USER }}"
     groups: docker
+    state: present
     append: yes
 
 - name: Autostart docker service
@@ -13,3 +14,4 @@
   ansible.builtin.systemd:
     name: docker
     enabled: yes
+    scope: system
