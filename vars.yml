@@ -54,9 +54,9 @@ packages:
 
 flatpaks:
   - name: io.atom.Atom
-      pacman: no
-      dnf: yes
-      apt: yes
+    pacman: no
+    dnf: yes
+    apt: yes
 
   - name: org.signal.Signal
     pacman: no
