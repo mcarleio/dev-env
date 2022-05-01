@@ -32,3 +32,11 @@
       source {{ apps.path_file }}
       source {{ config.aliases }}
     state: present
+
+- name: Add GRAALVM_HOME to customrc
+  ansible.builtin.lineinfile:
+    path: "{{ config.customrc }}"
+    insertbefore: "# Custom changes"
+    line: |
+      export GRAALVM_HOME={{ apps.link_dir }}/{{ apps.list["graalvm-jdk17"].symlinked_dir }}
+    state: present

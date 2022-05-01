@@ -5,3 +5,4 @@
  - ansible.builtin.import_tasks: system.yml
  - ansible.builtin.import_tasks: docker.yml
  - ansible.builtin.import_tasks: git-projects.yml
+ - ansible.builtin.import_tasks: graalvm.yml

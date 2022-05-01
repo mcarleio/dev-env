@@ -1,0 +1,6 @@
+---
+- ansible.builtin.include_vars: "{{ playbook_dir }}/vars.yml"
+
+- name: Install graalvm native-image
+  ansible.builtin.shell:
+    cmd: "{{ apps.link_dir }}/graalvm/bin/gu install native-image"
