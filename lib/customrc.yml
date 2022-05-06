@@ -10,6 +10,10 @@
     src: "{{ playbook_dir }}/dotfiles/aliases"
     dest: "{{ config.aliases }}"
 
+- name: Copy .vimrc to user home
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/dotfiles/vimrc"
+    dest: "{{ config.vimrc }}"
 
 - name: Setup customrc into zshrc
   ansible.builtin.lineinfile:

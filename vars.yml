@@ -94,6 +94,7 @@ config:
   zshrc: "{{ ansible_env.HOME }}/.zshrc"
   bashrc: "{{ ansible_env.HOME }}/.bashrc"
   customrc: "{{ ansible_env.HOME }}/.customrc"
+  vimrc: "{{ ansible_env.HOME }}/.vimrc"
   aliases: "{{ ansible_env.HOME }}/.custom_aliases"
 
   projects_folder: "{{ ansible_env.HOME }}/IdeaProjects/mcarleio"
