@@ -41,10 +41,6 @@ packages:
   - name: chromium
     apt: [chromium-browser, chromium-browser-l10n, chromium-codecs-ffmpeg, chromium-codecs-ffmpeg-extra]
 
-  - name: atom
-    dnf: [ ] # will be installed via flatpak
-    apt: [ ] # will be installed via flatpak
-
   # TODO: Finally decide for email client: Thunderbird, Geary, ...
   - name: thunderbird
 
@@ -53,10 +49,6 @@ packages:
     apt: [] # will be installed via flatpak
 
 flatpaks:
-  - name: io.atom.Atom
-    pacman: no
-    dnf: yes
-    apt: yes
 
   - name: org.signal.Signal
     pacman: no
@@ -147,29 +139,29 @@ apps:
     # Versions: https://api.sdkman.io/2/candidates/java/linuxx64/versions/list?installed=
     # TODO: Check if some of the apps could be better installed via OS' package manager
     jdk17:
-      url: https://api.sdkman.io/2/broker/download/java/17.0.3-zulu/linuxx64
+      url: https://api.sdkman.io/2/broker/download/java/17.0.6-zulu/linuxx64
       url_unversioned: yes
       symlinked_dir: jdk17
       bin_path: bin
     jdk11:
-      url: https://api.sdkman.io/2/broker/download/java/11.0.15-zulu/linuxx64
+      url: https://api.sdkman.io/2/broker/download/java/11.0.18-zulu/linuxx64
       url_unversioned: yes
       symlinked_dir: jdk11
     jdk8:
-      url: https://api.sdkman.io/2/broker/download/java/8.0.322-zulu/linuxx64
+      url: https://api.sdkman.io/2/broker/download/java/8.0.362-zulu/linuxx64
       url_unversioned: yes
       symlinked_dir: jdk8
     graalvm-jdk17:
-      url: https://api.sdkman.io/2/broker/download/java/22.1.0.r17-grl/linuxx64
+      url: https://api.sdkman.io/2/broker/download/java/22.3.1.r17-grl/linuxx64
       symlinked_dir: graalvm
       binaries: ["bin/gu"]
     maven:
       # url: https://dlcdn.apache.org/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz
-      url: https://api.sdkman.io/2/broker/download/maven/3.8.5/linuxx64
+      url: https://api.sdkman.io/2/broker/download/maven/3.9.1/linuxx64
       symlinked_dir: maven
       bin_path: bin
     gradle:
-      url: https://api.sdkman.io/2/broker/download/gradle/7.4.2/linuxx64
+      url: https://api.sdkman.io/2/broker/download/gradle/8.0.2/linuxx64
       symlinked_dir: gradle
       bin_path: bin
     cryptonify:
@@ -178,27 +170,27 @@ apps:
       desktop_file: cryptonify.desktop
       dependsOn: [jdk8]
     camunda:
-      url: https://downloads.camunda.cloud/release/camunda-modeler/5.0.0/camunda-modeler-5.0.0-linux-x64.tar.gz
+      url: https://downloads.camunda.cloud/release/camunda-modeler/5.9.0/camunda-modeler-5.9.0-linux-x64.tar.gz
       symlinked_dir: camunda-modeler
       desktop_file: camunda-modeler.desktop
       binaries: ["camunda-modeler"]
     idea:
       # TODO: Alternative extract version via curl 'https://data.services.jetbrains.com/products?code=IIU&release.type=release' | jq ".[0].releases[0]"
-      url: https://download.jetbrains.com/idea/ideaIU-2022.1.tar.gz
+      url: https://download.jetbrains.com/idea/ideaIU-2022.3.3.tar.gz
       symlinked_dir: idea
       desktop_file: jetbrains-idea.desktop
       # TODO: This is only here, as when changing the url (version), one need to amend this config as well
-      config_dir: "{{ config.dir }}/JetBrains/IntelliJIdea2022.1"
+      config_dir: "{{ config.dir }}/JetBrains/IntelliJIdea2022.3"
     terraform:
-      url: https://releases.hashicorp.com/terraform/1.1.9/terraform_1.1.9_linux_amd64.zip
+      url: https://releases.hashicorp.com/terraform/1.4.2/terraform_1.4.2_linux_amd64.zip
       single_file: terraform
     nodejs:
-      url: https://nodejs.org/dist/v16.15.0/node-v16.15.0-linux-x64.tar.xz
+      url: https://nodejs.org/dist/v18.15.0/node-v18.15.0-linux-x64.tar.xz
       symlinked_dir: nodejs
       bin_path: bin
     kubectl:
       # Current version: https://storage.googleapis.com/kubernetes-release/release/stable.txt
-      url: https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl
+      url: https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl
       executable: yes
 
 ref:
